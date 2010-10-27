@@ -1,3 +1,6 @@
-Thanks to Rajesh Dhawan and other authors of django-queue-service
-for the database model implementation.
-See http://code.google.com/p/django-queue-service/.
+* Thanks to Rajesh Dhawan and other authors of django-queue-service
+  for the database model implementation.
+  See http://code.google.com/p/django-queue-service/.
+
+* Thanks to haridsv for the draft SQLAlchemy port (which can still
+  be found at http://github.com/haridsv/celery-alchemy-poc)
