@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from kombu.transport import virtual
 
-from sqlakombu.models import Queue, Message
+from sqlakombu.models import Queue, Message, metadata
 
 
 class Channel(virtual.Channel):
@@ -15,12 +15,12 @@ class Channel(virtual.Channel):
 
     def _open(self):
         conninfo = self.connection.client
-        if conninfo.host not in self._engines:
-            engine = sqlalchemy.create_engine(conninfo.host)
+        if conninfo.hostname not in self._engines:
+            engine = create_engine(conninfo.hostname)
             Session = sessionmaker(bind=engine)
             metadata.create_all(engine)
-            self._engines[conninfo.host] = engine, Session
-        return self._engines[conninfo.host]
+            self._engines[conninfo.hostname] = engine, Session
+        return self._engines[conninfo.hostname]
 
     @property
     def session(self):
@@ -29,7 +29,7 @@ class Channel(virtual.Channel):
             self._session = Session()
         return self._session
 
-    def _get_or_create_queue(self, queue):
+    def _get_or_create(self, queue):
         obj = self.session.query(Queue).filter(Queue.name == queue) \
                     .first()
         if not obj:
@@ -41,9 +41,9 @@ class Channel(virtual.Channel):
     def _new_queue(self, queue, **kwargs):
         self._get_or_create(queue)
 
-    def _put(self, queue, message, **kwargs):
+    def _put(self, queue, payload, **kwargs):
         obj = self._get_or_create(queue)
-        message = Message(serialize(payload), queue)
+        message = Message(serialize(payload), obj)
         self.session.add(message)
         self.session.commit()
 
@@ -60,11 +60,12 @@ class Channel(virtual.Channel):
             msg.visible = False
             self.session.commit()
             return deserialize(msg.payload)
+        raise Empty()
 
     def _query_all(self, queue):
         obj = self._get_or_create(queue)
         return self.session.query(Message) \
-                .filter(queue_id == obj.id)
+                .filter(Message.queue_id == obj.id)
 
     def _purge(self, queue):
         count = self._query_all(queue).delete(synchronize_session=False)
