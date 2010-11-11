@@ -58,7 +58,7 @@ class Channel(virtual.Channel):
         obj = self._get_or_create(queue)
         msg = self.session.query(Message) \
                     .filter(Message.queue_id == obj.id) \
-                    .filter(Message.visible != 0) \
+                    .filter(Message.visible != False) \
                     .order_by(Message.sent_at) \
                     .order_by(Message.id) \
                     .limit(1) \
