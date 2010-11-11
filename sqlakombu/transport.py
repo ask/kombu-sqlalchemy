@@ -2,6 +2,7 @@ from Queue import Empty
 
 from anyjson import serialize, deserialize
 from sqlalchemy import create_engine
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 
 from kombu.transport import virtual
@@ -35,7 +36,10 @@ class Channel(virtual.Channel):
         if not obj:
             obj = Queue(queue)
             self.session.add(obj)
-            self.session.commit()
+            try:
+                self.session.commit()
+            except OperationalError:
+                self.session.rollback()
         return obj
 
     def _new_queue(self, queue, **kwargs):
@@ -45,7 +49,10 @@ class Channel(virtual.Channel):
         obj = self._get_or_create(queue)
         message = Message(serialize(payload), obj)
         self.session.add(message)
-        self.session.commit()
+        try:
+            self.session.commit()
+        except OperationalError:
+            self.session.rollback()
 
     def _get(self, queue):
         obj = self._get_or_create(queue)
@@ -69,7 +76,10 @@ class Channel(virtual.Channel):
 
     def _purge(self, queue):
         count = self._query_all(queue).delete(synchronize_session=False)
-        self.session.commit()
+        try:
+            self.session.commit()
+        except OperationalError:
+            self.session.rollback()
         return count
 
     def _size(self, queue):
