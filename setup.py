@@ -22,7 +22,7 @@ if root_dir != '':
     os.chdir(root_dir)
 src_dir = "sqlakombu"
 
-install_requires = []
+install_requires = ["sqlalchemy", "kombu"]
 
 
 def osx_install_data(install_data):
