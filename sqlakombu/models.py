@@ -36,8 +36,8 @@ class Message(ModelBase):
     sent_at = Column('timestamp', DateTime, nullable=True, index=True,
                      onupdate=datetime.datetime.now)
     payload = Column(Text, nullable=False)
-    queue_id = Column(SmallInteger, ForeignKey("kombu_queue.id",
-                                               name="FK_kombu_message_queue"))
+    queue_id = Column(Integer, ForeignKey("kombu_queue.id",
+                                          name="FK_kombu_message_queue"))
     version = Column(SmallInteger, nullable=False, default=1)
 
     __mapper_args__ = {"version_id_col": version}
