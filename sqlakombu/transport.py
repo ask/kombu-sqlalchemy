@@ -14,10 +14,16 @@ class Channel(virtual.Channel):
     _session = None
     _engines = {}   # engine cache
 
+    def _engine_from_config(self):
+        conninfo = self.connection.client
+        configuration = dict(self.connection.backend_extra_args)
+        url = conninfo.hostname
+        return create_engine(url, **configuration)
+
     def _open(self):
         conninfo = self.connection.client
         if conninfo.hostname not in self._engines:
-            engine = create_engine(conninfo.hostname)
+            engine = self._engine_from_config()
             Session = sessionmaker(bind=engine)
             metadata.create_all(engine)
             self._engines[conninfo.hostname] = engine, Session
