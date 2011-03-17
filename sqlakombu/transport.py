@@ -16,7 +16,7 @@ class Channel(virtual.Channel):
 
     def _engine_from_config(self):
         conninfo = self.connection.client
-        configuration = dict(conninfo.backend_extra_args)
+        configuration = dict(conninfo.transport_options)
         url = conninfo.hostname
         return create_engine(url, **configuration)
 
