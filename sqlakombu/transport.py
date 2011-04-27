@@ -62,18 +62,23 @@ class Channel(virtual.Channel):
 
     def _get(self, queue):
         obj = self._get_or_create(queue)
-        msg = self.session.query(Message) \
-                    .filter(Message.queue_id == obj.id) \
-                    .filter(Message.visible != False) \
-                    .order_by(Message.sent_at) \
-                    .order_by(Message.id) \
-                    .limit(1) \
-                    .first()
-        if msg:
-            msg.visible = False
+        if self.session.bind.name == 'sqlite':
+            self.session.execute('BEGIN IMMEDIATE TRANSACTION')
+        try:
+            msg = self.session.query(Message) \
+                        .with_lockmode('update') \
+                        .filter(Message.queue_id == obj.id) \
+                        .filter(Message.visible != False) \
+                        .order_by(Message.sent_at) \
+                        .order_by(Message.id) \
+                        .limit(1) \
+                        .first()
+            if msg:
+                msg.visible = False
+                return deserialize(msg.payload)
+            raise Empty()
+        finally:
             self.session.commit()
-            return deserialize(msg.payload)
-        raise Empty()
 
     def _query_all(self, queue):
         obj = self._get_or_create(queue)

@@ -12,7 +12,7 @@ ModelBase = declarative_base(metadata=metadata)
 
 class Queue(ModelBase):
     __tablename__ = "kombu_queue"
-    __table_args__ = {"sqlite_autoincrement": True}
+    __table_args__ = {"sqlite_autoincrement": True, 'mysql_engine': 'InnoDB'}
 
     id = Column(Integer, Sequence("queue_id_sequence"), primary_key=True,
                       autoincrement=True)
@@ -28,7 +28,7 @@ class Queue(ModelBase):
 
 class Message(ModelBase):
     __tablename__ = "kombu_message"
-    __table_args__ = {"sqlite_autoincrement": True}
+    __table_args__ = {"sqlite_autoincrement": True, 'mysql_engine': 'InnoDB'}
 
     id = Column(Integer, Sequence("message_id_sequence"), primary_key=True,
                                   autoincrement=True)

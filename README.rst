@@ -15,7 +15,11 @@ for `Kombu`_.
 ``sqlakombu.transport.Transport``, which is used like this::
 
     >>> from kombu.connection import BrokerConnection
-    >>> c = BrokerConnection(transport="sqlakombu.transport.Transport")
+    >>> c = BrokerConnection(DB_URL, transport="sqlakombu.transport.Transport")
+
+``DB_URL`` should be a valid SQLAlchemy database connection url in the form::
+
+    "dialect+driver://username:password@host:port/database"
 
 
 .. _`Kombu`: http://pypi.python.org/pypi/kombu
