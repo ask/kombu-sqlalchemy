@@ -4,6 +4,17 @@ kombu-sqlalchemy - Kombu transport using SQLAlchemy
 
 :version: 1.1.0
 
+Deprecated
+==========
+
+kombu-sqlalchemy has now moved into Kombu core, so this repository
+is no longer in use.
+
+To upgrade, install the latest Kombu version.
+
+**ORIGINAL README BELOW**
+
+
 Introduction
 ============
 
